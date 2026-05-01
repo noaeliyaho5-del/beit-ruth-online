@@ -1,0 +1,192 @@
+
+<div id="app" style="direction:rtl;font-family:Arial,sans-serif;padding:12px;max-width:660px;margin:0 auto;background:#F4F6FB;min-height:400px;">
+
+<div style="background:#1E3A6E;border-radius:12px;padding:16px 20px;margin-bottom:12px;display:flex;align-items:center;gap:14px;">
+  <div style="background:#fff;border-radius:50%;width:54px;height:54px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+    <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="50,10 82,35 18,35" fill="none" stroke="#1E3A6E" stroke-width="6" stroke-linejoin="round"/>
+      <rect x="22" y="35" width="56" height="40" rx="3" fill="none" stroke="#1E3A6E" stroke-width="6"/>
+      <rect x="38" y="50" width="24" height="25" rx="2" fill="#1E3A6E"/>
+      <path d="M50,42 C50,42 33,52 33,63 C33,72 50,82 50,82 C50,82 67,72 67,63 C67,52 50,42 50,42Z" fill="#D42B3A"/>
+    </svg>
+  </div>
+  <div>
+    <div style="color:#fff;font-size:18px;font-weight:700;">מסירת משמרת – בית רות</div>
+    <div style="color:#A8BFDF;font-size:13px;margin-top:2px;">לילה ← בוקר</div>
+  </div>
+</div>
+
+<div style="background:#fff;border:1.5px solid #D0D8EA;border-radius:12px;padding:16px;margin-bottom:12px;">
+  <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+    <span style="font-size:14px;font-weight:600;color:#1E3A6E;">התקדמות</span>
+    <span style="font-size:14px;font-weight:700;color:#1E3A6E;" id="cnt">0 / 30</span>
+  </div>
+  <div style="background:#E0E6F0;border-radius:6px;height:14px;overflow:hidden;">
+    <div id="bar" style="height:14px;border-radius:6px;background:#1D9E75;width:0%;transition:width 0.3s;"></div>
+  </div>
+  <button id="relBtn" onclick="tryRelease()" style="margin-top:12px;width:100%;padding:14px;border-radius:8px;font-size:16px;font-weight:700;border:none;background:#C8D4E8;color:#7A8FAA;cursor:not-allowed;font-family:Arial,sans-serif;">
+    שחרור המדריכה – יש להשלים הכל
+  </button>
+</div>
+
+<div id="sections"></div>
+
+</div>
+
+<script>
+var state = {};
+var convDone = false;
+
+var data = [
+  {
+    title: "חדרים – קומה עליונה",
+    items: [
+      {id:"r1", icon:"🛏", text:"חדר 1 – נבדק ותקין"},
+      {id:"r2", icon:"🛏", text:"חדר 2 – נבדק ותקין"},
+      {id:"r3", icon:"🛏", text:"חדר 3 – נבדק ותקין"},
+      {id:"r4", icon:"🛏", text:"חדר 4 – נבדק ותקין"},
+      {id:"r5", icon:"🛏", text:"חדר 5 – נבדק ותקין"}
+    ]
+  },
+  {
+    title: "שטחים משותפים – קומה עליונה",
+    items: [
+      {id:"u1", icon:"🚿", text:"שירותים ומקלחות – נבדקו ותקינים"},
+      {id:"u2", icon:"🛋", text:"מרחב משותף למעלה – נבדק ותקין"}
+    ]
+  },
+  {
+    title: "קומה תחתונה",
+    items: [
+      {id:"l1", icon:"🍽", text:"מטבח – נבדק ותקין"},
+      {id:"l2", icon:"🪑", text:"פינת אוכל – נבדקה ותקינה"},
+      {id:"l3", icon:"💻", text:"פינת מחשבים – נבדקה ותקינה"},
+      {id:"l4", icon:"🧘", text:"חדר הרגיעה – נבדק ותקין"},
+      {id:"l5", icon:"🛋", text:"סלון – נבדק ותקין"},
+      {id:"l6", icon:"🌿", text:"מרפסות – נבדקו ותקינות"}
+    ]
+  },
+  {
+    title: "צוות ומנהל",
+    items: [
+      {id:"a1", icon:"👥", text:"חדר צוות – נבדק ותקין"},
+      {id:"a2", icon:"🔑", text:"שירותי צוות – נבדקו ותקינים"},
+      {id:"a3", icon:"📋", text:"משמרת נפתחה במערכת (תעלה)"},
+      {id:"a4", icon:"💊", text:"טיפולים תרופתיים סומנו"},
+      {id:"a5", icon:"📅", text:"פגישות תועדו"},
+      {id:"a6", icon:"⚠️", text:"אירועים חריגים תועדו"}
+    ]
+  }
+];
+
+var TOTAL = 30;
+
+function toggle(id) {
+  state[id] = !state[id];
+  var el = document.getElementById('item-' + id);
+  if (el) {
+    if (state[id]) {
+      el.style.background = '#E1F5EE';
+      el.style.borderColor = '#1D9E75';
+      var box = el.querySelector('.chkbox');
+      if (box) { box.style.background = '#1D9E75'; box.innerHTML = '<span style="color:#fff;font-weight:700;font-size:14px;">✓</span>'; }
+      var lbl = el.querySelector('.lbl');
+      if (lbl) { lbl.style.color = '#0F6E56'; }
+    } else {
+      el.style.background = '#fff';
+      el.style.borderColor = '#D0D8EA';
+      var box = el.querySelector('.chkbox');
+      if (box) { box.style.background = '#fff'; box.innerHTML = ''; }
+      var lbl = el.querySelector('.lbl');
+      if (lbl) { lbl.style.color = '#1E3A6E'; }
+    }
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  var checked = 0;
+  for (var k in state) { if (state[k]) checked++; }
+  if (convDone) checked++;
+  var pct = Math.round((checked / TOTAL) * 100);
+  document.getElementById('bar').style.width = pct + '%';
+  document.getElementById('cnt').textContent = checked + ' / ' + TOTAL;
+  var btn = document.getElementById('relBtn');
+  if (checked === TOTAL) {
+    btn.style.background = '#1D9E75';
+    btn.style.color = '#fff';
+    btn.style.cursor = 'pointer';
+    btn.textContent = 'שחרור המדריכה ✓';
+  } else {
+    btn.style.background = '#C8D4E8';
+    btn.style.color = '#7A8FAA';
+    btn.style.cursor = 'not-allowed';
+    btn.textContent = 'שחרור המדריכה – יש להשלים הכל (' + checked + '/' + TOTAL + ')';
+  }
+}
+
+function markConv() {
+  var q1 = document.getElementById('q1').value.trim();
+  var q2 = document.getElementById('q2').value.trim();
+  if (!q1 || !q2) {
+    alert('יש למלא את שתי השאלות הראשונות.');
+    return;
+  }
+  convDone = true;
+  document.getElementById('convBtn').textContent = 'שיחת מסירה הושלמה ✓';
+  document.getElementById('convBtn').style.background = '#1D9E75';
+  document.getElementById('convBtn').disabled = true;
+  document.getElementById('convDone').style.display = 'block';
+  updateProgress();
+}
+
+function tryRelease() {
+  var checked = 0;
+  for (var k in state) { if (state[k]) checked++; }
+  if (convDone) checked++;
+  if (checked < TOTAL) return;
+  var q1 = document.getElementById('q1').value.trim();
+  var q2 = document.getElementById('q2').value.trim();
+  var q3 = document.getElementById('q3').value.trim();
+  sendPrompt('כל פריטי מסירת המשמרת הושלמו בבית רות.\nפעילות בכניסה: ' + q1 + '\nשיחת פתיחת יום: ' + q2 + '\nהערות: ' + (q3 || 'אין') + '\nאנא צור סיכום מסירת משמרת.');
+}
+
+function buildUI() {
+  var html = '';
+  data.forEach(function(section) {
+    html += '<div style="margin-bottom:12px;">';
+    html += '<div style="font-size:12px;font-weight:700;color:#5A6A8A;letter-spacing:0.07em;margin-bottom:6px;padding-right:2px;">' + section.title + '</div>';
+    section.items.forEach(function(item) {
+      html += '<div id="item-' + item.id + '" onclick="toggle(\'' + item.id + '\')" style="display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid #D0D8EA;border-radius:8px;padding:13px 14px;margin-bottom:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;">';
+      html += '<span style="font-size:20px;">' + item.icon + '</span>';
+      html += '<div class="chkbox" style="width:24px;height:24px;border:2px solid #D0D8EA;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff;"></div>';
+      html += '<span class="lbl" style="font-size:14px;color:#1E3A6E;flex:1;">' + item.text + '</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+
+  html += '<div style="margin-bottom:12px;">';
+  html += '<div style="font-size:12px;font-weight:700;color:#5A6A8A;letter-spacing:0.07em;margin-bottom:6px;">שיחת מסירה עם המדריכה היוצאת</div>';
+  html += '<div style="background:#fff;border:1.5px solid #D0D8EA;border-radius:12px;padding:16px;">';
+  html += '<div style="font-size:15px;font-weight:700;color:#1E3A6E;margin-bottom:14px;">💬 יש למלא לפני שחרור המדריכה</div>';
+
+  html += '<div style="margin-bottom:10px;"><label style="display:block;font-size:13px;color:#5A6A8A;margin-bottom:4px;font-weight:600;">1. האם התקיימה פעילות בכניסה למשמרת? אם כן – מה?</label>';
+  html += '<textarea id="q1" style="width:100%;border:1.5px solid #D0D8EA;border-radius:8px;padding:10px 12px;font-size:14px;font-family:Arial,sans-serif;color:#1E3A6E;background:#F4F6FB;resize:none;height:64px;direction:rtl;" placeholder="תאר/י פעילות או כתוב/י לא הייתה פעילות..."></textarea></div>';
+
+  html += '<div style="margin-bottom:10px;"><label style="display:block;font-size:13px;color:#5A6A8A;margin-bottom:4px;font-weight:600;">2. האם התקיימה שיחת פתיחת יום?</label>';
+  html += '<textarea id="q2" style="width:100%;border:1.5px solid #D0D8EA;border-radius:8px;padding:10px 12px;font-size:14px;font-family:Arial,sans-serif;color:#1E3A6E;background:#F4F6FB;resize:none;height:64px;direction:rtl;" placeholder="כן / לא – אם כן פרט/י..."></textarea></div>';
+
+  html += '<div style="margin-bottom:12px;"><label style="display:block;font-size:13px;color:#5A6A8A;margin-bottom:4px;font-weight:600;">3. הערות נוספות מהמדריכה היוצאת</label>';
+  html += '<textarea id="q3" style="width:100%;border:1.5px solid #D0D8EA;border-radius:8px;padding:10px 12px;font-size:14px;font-family:Arial,sans-serif;color:#1E3A6E;background:#F4F6FB;resize:none;height:64px;direction:rtl;" placeholder="הערות, אזהרות, מידע חשוב..."></textarea></div>';
+
+  html += '<button id="convBtn" onclick="markConv()" style="width:100%;padding:13px;border-radius:8px;font-size:15px;font-weight:700;border:none;background:#1E3A6E;color:#fff;cursor:pointer;font-family:Arial,sans-serif;">סמן שיחה כהושלמה</button>';
+  html += '<div id="convDone" style="display:none;margin-top:8px;background:#E1F5EE;border:1.5px solid #1D9E75;border-radius:8px;padding:10px 14px;color:#0F6E56;font-size:14px;font-weight:600;">✓ שיחת המסירה הושלמה</div>';
+  html += '</div></div>';
+
+  document.getElementById('sections').innerHTML = html;
+}
+
+buildUI();
+updateProgress();
+</script>
